@@ -134,9 +134,6 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Media files (uploads)
-media/
-
 # Static files (if collected)
 staticfiles/
 
