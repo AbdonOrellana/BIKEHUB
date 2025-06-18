@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static widget_tweaks %}
+    {% load formatos %}
+    <meta charset="UTF-8">
+    <title>Formulario de Arriendo - BIKEHUB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{% static 'js/arriendo.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            transform: translateY(-2px);
+        }
+        .bike-preview {
+            transition: all 0.5s ease;
+        }
+        .bike-preview:hover {
+            transform: scale(1.05);
+        }
+        .payment-option {
+            transition: all 0.3s ease;
+        }
+        .payment-option:hover {
+            transform: translateY(-3px);
+        }
+        .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50"> 
+    {% include 'clientes/navbar.html' %}
+    <div class="container mx-auto mt-12 p-4">
+        <div class="bg-white shadow-xl rounded-xl p-8 max-w-2xl mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-blue-700 mb-2">
+                    <i class="fas fa-bicycle mr-2"></i>Solicitud de Arriendo
+                </h1>
+                <p class="text-gray-600">Complete el formulario para arrendar su bicicleta</p>
+            </div>
+            {% if form.errors %}
+              <div class="bg-red-100 text-red-700 p-2 mb-4 rounded">
+                <strong>Errores en el formulario:</strong>
+                <ul>
+                  {% for field in form %}
+                    {% for error in field.errors %}
+                      <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                  {% endfor %}
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            <form method="post" class="space-y-6" id="arriendoForm">
+                {% csrf_token %}
+                <div class="grid gap-6 grid-cols-1 sm:grid-cols-2">
+                    <div class="col-span-1 sm:col-span-2">
+                        <label for="id_bicicleta" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-bicycle mr-2"></i>Seleccione una Bicicleta
+                        </label>
+                        <select name="bicicleta" id="id_bicicleta" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            {% for bicicleta in bicicletas %}
+                                <option value="{{ bicicleta.id }}" data-precio="{{ bicicleta.precio_por_dia }}" data-imagen-url="{{ bicicleta.imagen.url }}">
+                                    {{ bicicleta.marca }} {{ bicicleta.modelo }} - {{ bicicleta.precio_por_dia|formato_clp }}/día
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="id_fecha_inicio" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="far fa-calendar-alt mr-2"></i>Fecha inicio
+                        </label>
+                        {{ form.fecha_inicio|add_class:"form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    <div>
+                        <label for="id_fecha_fin" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="far fa-calendar-check mr-2"></i>Fecha fin
+                        </label>
+                        {{ form.fecha_fin|add_class:"form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    
+                    <div>
+                        <label for="formatted_costo_arriendo" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-dollar-sign mr-2"></i>Costo arriendo
+                        </label>
+                        <input type="text" id="formatted_costo_arriendo" readonly class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="hidden" id="id_costo_arriendo" name="costo_arriendo">
+                    </div>
+                    <div>
+                        <label for="formatted_deposito_garantia" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-shield-alt mr-2"></i>Depósito garantía
+                        </label>
+                        <input type="text" id="formatted_deposito_garantia" readonly class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="hidden" id="id_deposito_garantia" name="deposito_garantia">
+                    </div>
+                    <div class="col-span-1 sm:col-span-2">
+                        <label for="formatted_costo_total" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calculator mr-2"></i>Costo total
+                        </label>
+                        <input type="text" id="formatted_costo_total" readonly class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="hidden" id="id_costo_total" name="costo_total">
+                    </div>
+                    <div>
+                        <label for="forma_pago" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-credit-card mr-2"></i>Forma de pago
+                        </label>
+                        {{ form.forma_pago|add_class:"form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                </div>
+                <div class="form-group text-center mt-8">
+                    <img id="bicicleta-preview" src="" alt="Vista previa de bicicleta" class="bike-preview mx-auto hidden w-64 h-auto rounded-lg shadow-lg">
+                </div>
+                <div class="text-center mt-8">
+                    <button type="submit" id="procederPagoBtn" class="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-credit-card mr-2"></i>Proceder con el pago
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    {% load formatos %}
+    <meta charset="UTF-8">
+    <title>Detalle de Orden de Arriendo - BIKEHUB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+<body> {% include 'clientes/navbar.html' %}
+    <div class="container mx-auto mt-12">
+        <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-2xl font-bold text-center text-red-600 p-4 mb-6">Estamos preparando tu pedido!</h1>
+            <hr>
+            <h1 class="text-2xl font-bold text-center text-blue-700 mt-4 mb-6">Detalle de Orden de Arriendo</h1>
+            <ul class="space-y-4">
+                <li><strong>Número de Orden:</strong> {{ orden.id }}</li>
+                <li><strong>Bicicleta Arrendada:</strong> {{ orden.bicicleta.modelo }}</li>
+                <li><strong>Fecha de Inicio:</strong> {{ orden.fecha_inicio|date:"d M Y H:i" }}</li>
+                <li><strong>Fecha de Fin:</strong> {{ orden.fecha_fin|date:"d M Y H:i" }}</li>
+                <li><strong>Costo Total del Arriendo:</strong> {{ orden.costo_total|formato_clp }}</li>
+                <li><strong>Forma de Pago:</strong> {{ orden.get_forma_pago_display }}</li>
+                <li><strong>Estado de orden:</strong> {{ orden.get_estado_display }}</li>
+            </ul>
+            <div class="mt-6 text-center">
+                <a href="{% url 'ver_ordenes' %}" class="text-white bg-blue-600 hover:bg-blue-700 font-bold py-2 px-4 rounded">Volver a Arriendos</a>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

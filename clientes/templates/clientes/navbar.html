@@ -1,0 +1,81 @@
+{% load static %}
+<nav class="bg-slate-800 p-4 shadow-md">
+    <div class="container mx-auto flex items-center justify-between">
+        
+        <div class="flex-shrink-0">
+            <a href="{% url 'home' %}" class="text-white text-2xl font-bold">BIKEHUB</a>
+        </div>
+        
+        <div class="flex items-center space-x-4 flex-grow justify-center px-2 sm:px-4">
+            <div class="relative flex-shrink-0" id="categorias-dropdown">
+                <button class="text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium" id="categorias-btn">
+                    Servicios ▼
+                </button>
+                <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-20" id="categorias-menu">
+                    <div class="py-1" role="menu" aria-orientation="vertical">
+                        <a href="{% url 'catalogo_bicicletas' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Bicicletas</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'arriendo' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Arriendo</a>
+                            <a href="{% url 'reparacion' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reparación</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <form class="flex flex-grow items-center max-w-lg" action="{% url 'buscar_bicicletas' %}" method="get">
+                <input type="text" placeholder="Buscar bicicleta..." name="search" id="search-input" class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <button type="submit" class="flex-shrink-0 text-sm px-6 py-2 rounded-r-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Buscar</button>
+            </form>
+        </div>
+
+        <div class="flex items-center space-x-3 sm:space-x-4 flex-shrink-0">
+            {% if user.is_authenticated %}
+                <div class="relative" id="user-dropdown">
+                    <span class="text-white cursor-pointer text-sm md:text-base" id="user-name">Hola, {{ user.first_name }} ▼</span>
+                    <div class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-20" id="user-menu">
+                        <a href="{% url 'ver_ordenes' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mis Solicitudes</a>
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar Sesión</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-secondary-outline">Iniciar Sesión</a>
+                <a href="{% url 'registro' %}" class="btn btn-primary">Registrarse</a>
+            {% endif %}
+            {% include 'Carro/carrito.html' %}
+        </div>
+    </div>
+</nav>
+
+<div id="toast-container" class="fixed top-24 right-5 z-50 w-full max-w-xs sm:max-w-sm">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast flex items-center gap-3 p-4 mb-4 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-lg" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toasts = document.querySelectorAll('#toast-container .toast');
+    
+    toasts.forEach((toast, index) => {
+        // Muestra el toast con una animación
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 300 * index);
+
+        // Oculta y elimina el toast después de 5 segundos
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 500); // Coincide con la duración de la transición en tu style.css
+        }, 5000 + (300 * index));
+    });
+});
+</script>  

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Gestión de Bicicletas e Inventario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-12 p-4">
+        <div class="bg-white shadow-md rounded-lg p-8 max-w-lg mx-auto">
+            <h1 class="text-2xl font-bold text-center text-green-600 mb-6">Gestión de Bicicletas e Inventario</h1>
+            <div class="text-center">
+                <a href="{% url 'agregar_bicicleta' %}" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 block mb-4">Agregar Nueva Bicicleta</a>
+                <a href="{% url 'gestion_inventario' %}" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600">Actualizar Inventario</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

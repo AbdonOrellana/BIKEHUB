@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static widget_tweaks %}
+    <meta charset="UTF-8">
+    <title>Gestionar Inventario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-12 p-4">
+        <div class="bg-white shadow-md rounded-lg p-8 max-w-lg mx-auto">
+            <h1 class="text-2xl font-bold text-center text-green-600 mb-6">Actualizar Inventario</h1>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="{{ inventario_form.bicicleta.id_for_label }}" class="block text-gray-700">{{ inventario_form.bicicleta.label }}</label>
+                    {% render_field inventario_form.bicicleta class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" %}
+                    {% if inventario_form.bicicleta.errors %}
+                        <p class="text-red-500 text-xs italic">{{ inventario_form.bicicleta.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    <label for="{{ inventario_form.cantidad.id_for_label }}" class="block text-gray-700">{{ inventario_form.cantidad.label }}</label>
+                    {% render_field inventario_form.cantidad class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" %}
+                    {% if inventario_form.cantidad.errors %}
+                        <p class="text-red-500 text-xs italic">{{ inventario_form.cantidad.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="text-center mt-6">
+                    <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600">Actualizar Inventario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

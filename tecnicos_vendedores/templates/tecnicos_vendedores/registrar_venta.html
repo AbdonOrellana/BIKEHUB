@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Venta</title>
+</head>
+<body>
+    <div>
+        <h1>Registrar Venta</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <div class="formsetRow">
+                    {{ form.as_p }}
+                    {% if not forloop.first %}
+                        <button type="button" class="removeRow">Eliminar</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="button" id="addRow">Añadir Bicicleta</button>
+            <input type="submit" value="Registrar Venta">
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('formsetContainer');
+            const addButton = document.getElementById('addRow');
+            let totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+            
+            addButton.addEventListener('click', function() {
+                let newForm = container.querySelector('.formsetRow:last-child').cloneNode(true);
+                let formRegex = RegExp(`id_${formset.prefix}-\\d+-`, 'g');
+
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `id_${formset.prefix}-${totalForms.value}-`);
+                container.appendChild(newForm);
+                totalForms.value = parseInt(totalForms.value) + 1; // Increment the number of total forms
+                newForm.querySelector('.removeRow').addEventListener('click', function() {
+                    this.parentElement.remove();
+                    totalForms.value = parseInt(totalForms.value) - 1; // Decrement the total forms count
+                });
+            });
+
+            container.addEventListener('click', function(event) {
+                if (event.target.classList.contains('removeRow')) {
+                    event.target.closest('.formsetRow').remove();
+                    totalForms.value = parseInt(totalForms.value) - 1; // Decrement the total forms count
+                }
+            });
+        });
+    </script>
+</body>
+</html>
