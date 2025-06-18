@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - BIKEHUB</title>
+    {% load static widget_tweaks %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            transform: translateY(-2px);
+        }
+        .alert-message {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    {% include 'clientes/navbar.html' %}
+    <div class="container mx-auto mt-12 px-4">
+        <div class="max-w-md mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-blue-700 mb-2">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                </h1>
+                <p class="text-gray-600">Ingresa tus credenciales para acceder a tu cuenta</p>
+            </div>
+
+            <form method="post" class="bg-white shadow-xl rounded-xl p-8">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert-message bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-md shadow-md mb-6" role="alert">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-xl mr-3"></i>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="space-y-6">
+                    {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas {% if field.name == 'username' %}fa-user{% else %}fa-lock{% endif %} mr-2"></i>
+                                {{ field.label }}
+                            </label>
+                            {{ field|add_class:"form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                            {% if field.errors %}
+                                <p class="text-red-500 text-xs italic mt-1">{{ field.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-8">
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-6">
+                <p class="text-gray-600">
+                    ¿No tienes una cuenta? 
+                    <a href="{% url 'registro' %}" class="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-300">
+                        <i class="fas fa-user-plus mr-1"></i>Regístrate aquí
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

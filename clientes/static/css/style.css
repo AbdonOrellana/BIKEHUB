@@ -1,0 +1,161 @@
+/* === ESTILOS GENERALES Y TEMA "AZUL MODERNO" === */
+body {
+    font-family: Arial, sans-serif;
+    /* background-color: #EAF2F8; */ /* Comentado para permitir que Tailwind controle el fondo */
+    color: #2C3E50;           /* Color de texto principal oscuro y azulado */
+    margin: 0;
+    padding: 0;
+}
+
+/* === CAJA DE CONTENIDO PERSONALIZADA === */
+/* Esta clase reemplaza a la antigua clase ".container" que entraba en conflicto con Tailwind. */
+/* Úsala para las cajas blancas que contienen formularios o contenido principal. */
+.content-box {
+    width: 90%;
+    max-width: 512px; /* Similar a max-w-lg de Tailwind */
+    margin: 50px auto;
+    background: #FFFFFF;
+    padding: 32px; /* Equivalente a p-8 de Tailwind */
+    box-shadow: 0px 4px 12px rgba(44, 62, 80, 0.15); /* Sombra suave */
+    border-radius: 8px;
+}
+
+/* === ESTILOS DE FORMULARIO === */
+/* Esta clase se aplica solo a los formularios que deben ser verticales */
+.form-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilo para todas las etiquetas dentro de un formulario vertical */
+.form-vertical label {
+    margin-bottom: 8px;
+    font-weight: 600; /* semibold */
+    color: #34495E;
+    font-size: 14px;
+}
+
+/* Estilo para todos los inputs y selects dentro de un formulario vertical */
+.form-vertical input[type="text"],
+.form-vertical input[type="email"],
+.form-vertical input[type="password"],
+.form-vertical input[type="tel"],
+.form-vertical textarea,
+.form-vertical select {
+    padding: 12px;
+    border: 1px solid #A9CCE3;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    background-color: #FDFEFE;
+    color: #2C3E50;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+    margin-bottom: 20px;
+    appearance: none; /* Quita la apariencia nativa de los selects */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Estilo para el estado de foco en los campos del formulario */
+.form-vertical input:focus,
+.form-vertical textarea:focus,
+.form-vertical select:focus {
+    border-color: #2980B9;
+    box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2);
+    outline: none;
+}
+
+/* Estilo para todos los botones dentro de un formulario vertical */
+.form-vertical button {
+    padding: 12px 20px;
+    background-color: #2980B9; /* Azul primario */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.form-vertical button:hover {
+    background-color: #2471A3; /* Azul más oscuro */
+}
+
+/* === ESTILOS DE BOTÓN GENÉRICOS (PARA NAVBAR, ETC.) === */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    line-height: 1.5;
+}
+
+.btn-primary {
+    background-color: #2980B9;
+    color: white;
+    border: 1px solid #2980B9;
+}
+
+.btn-primary:hover {
+    background-color: #2471A3;
+    border-color: #2471A3;
+}
+
+.btn-secondary-outline {
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.btn-secondary-outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: white;
+}
+/* === ESTILOS PARA NOTIFICACIONES "TOAST" === */
+
+/* Contenedor que posiciona los toasts en la esquina superior derecha */
+#toast-container {
+    position: fixed;
+    top: 90px;  /* Un poco por debajo de la navbar */
+    right: 20px;
+    z-index: 1050; /* Un z-index alto para que esté por encima de todo */
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre notificaciones si aparecen varias */
+}
+
+/* Estilo individual de cada notificación */
+.toast {
+    background-color: #2980B9; /* Azul primario de tu tema para éxito */
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0; /* Inicialmente invisible */
+    transform: translateX(110%); /* Inicialmente fuera de la pantalla a la derecha */
+    transition: opacity 0.4s ease, transform 0.4s ease; /* Transición suave */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+/* Clase para mostrar la notificación */
+.toast.show {
+    opacity: 1;
+    transform: translateX(0); /* Mueve la notificación a su posición visible */
+}
+
+/* Clase para ocultar la notificación */
+.toast.hide {
+    opacity: 0;
+    transform: translateX(110%); /* Mueve la notificación de vuelta fuera de la pantalla */
+}

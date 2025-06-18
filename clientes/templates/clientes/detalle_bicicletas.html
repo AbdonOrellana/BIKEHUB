@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static formatos %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>Detalles de Bicicleta - {{ bicicleta.modelo }}</title>
+</head>
+<body class="bg-gray-50">
+    {% include 'clientes/navbar.html'%}
+    
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="mb-8">
+                <ol class="flex items-center space-x-2 text-sm">
+                    <li><a href="{% url 'catalogo_bicicletas' %}" class="text-blue-600 hover:text-blue-800">Catálogo</a></li>
+                    <li class="text-gray-500">/</li>
+                    <li class="text-gray-700">{{ bicicleta.marca }} {{ bicicleta.modelo }}</li>
+                </ol>
+            </nav>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+                    <!-- Imagen y Galería -->
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <img src="{{ bicicleta.imagen.url }}" 
+                                 alt="{{ bicicleta.marca }} {{ bicicleta.modelo }}" 
+                                 class="w-full h-96 object-cover rounded-lg">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                                    {{ bicicleta.tipo }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <!-- Aquí podrías agregar más imágenes en miniatura -->
+                        </div>
+                    </div>
+
+                    <!-- Información del Producto -->
+                    <div class="space-y-6">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                                {{ bicicleta.marca }} {{ bicicleta.modelo }}
+                            </h1>
+                            <p class="text-2xl font-bold text-blue-600 mb-4">
+                                {{ bicicleta.precio_venta|formato_clp }}
+                            </p>
+                        </div>
+
+                        <!-- Especificaciones -->
+                        <div class="border-t border-b border-gray-200 py-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Especificaciones</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Marca</p>
+                                    <p class="font-medium">{{ bicicleta.marca }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Modelo</p>
+                                    <p class="font-medium">{{ bicicleta.modelo }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Tipo</p>
+                                    <p class="font-medium">{{ bicicleta.tipo }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Stock</p>
+                                    <p class="font-medium">{{ bicicleta.stock }} unidades</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                {{ bicicleta.descripcion }}
+                            </p>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="space-y-4">
+                            <form action="{% url 'Carro:agregar_a_carrito' bicicleta.id %}" method="post" class="space-y-4">
+                                {% csrf_token %}
+                                <div class="flex items-center space-x-4">
+                                    <button type="submit" 
+                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                                        Agregar al Carrito
+                                    </button>
+                                    <button type="button" 
+                                            class="flex items-center justify-center w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors duration-200">
+                                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

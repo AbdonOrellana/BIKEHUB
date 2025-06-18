@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load formatos %}
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Resultados de Búsqueda - MasterBikes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-50">
+    {% include 'clientes/navbar.html' %}
+    
+    <div class="container mx-auto px-4 py-8">
+        <!-- Encabezado y Resumen de Búsqueda -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Resultados de Búsqueda</h1>
+            <p class="text-gray-600">
+                {% if resultados %}
+                    Se encontraron {{ resultados|length }} resultados para tu búsqueda
+                {% else %}
+                    No se encontraron resultados para tu búsqueda
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Filtros de Ordenamiento -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm font-medium text-gray-700">Ordenar por:</span>
+                    <select class="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="relevancia">Relevancia</option>
+                        <option value="precio_asc">Precio: Menor a Mayor</option>
+                        <option value="precio_desc">Precio: Mayor a Menor</option>
+                        <option value="nombre_asc">Nombre: A-Z</option>
+                        <option value="nombre_desc">Nombre: Z-A</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm font-medium text-gray-700">Ver como:</span>
+                    <div class="flex space-x-2">
+                        <button class="p-2 rounded-md hover:bg-gray-100">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+                        <button class="p-2 rounded-md hover:bg-gray-100">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Resultados -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for bicicleta in resultados %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
+                <a href="{% url 'detalles_bicicleta' bicicleta.id %}" class="block">
+                    <div class="relative">
+                        <img src="{{ bicicleta.imagen.url }}" 
+                             alt="{{ bicicleta.marca }} {{ bicicleta.modelo }}" 
+                             class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm">
+                            {{ bicicleta.tipo }}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">
+                            {{ bicicleta.marca }} {{ bicicleta.modelo }}
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-2">
+                            {{ bicicleta.descripcion|truncatechars:100 }}
+                        </p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-xl font-bold text-blue-600">
+                                {{ bicicleta.precio_venta|formato_clp }}
+                            </span>
+                            <form action="{% url 'Carro:agregar_a_carrito' bicicleta.id %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+                                    Agregar al Carrito
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full">
+                <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">No se encontraron resultados</h3>
+                    <p class="text-gray-600 mb-4">Intenta con otros términos de búsqueda o revisa nuestros productos destacados</p>
+                    <a href="{% url 'catalogo_bicicletas' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200">
+                        Ver Catálogo Completo
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

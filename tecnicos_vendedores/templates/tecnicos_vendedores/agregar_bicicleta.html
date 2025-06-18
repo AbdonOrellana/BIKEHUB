@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static widget_tweaks %}
+    <meta charset="UTF-8">
+    <title>Registrar Venta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .formsetRow { margin-bottom: 10px; }
+        .removeRow { margin-top: 10px; background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        #addRow { margin-top: 20px; background-color: blue; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-12 p-4">
+        <div class="bg-white shadow-md rounded-lg p-8 max-w-lg mx-auto">
+            <h1 class="text-2xl font-bold text-center text-green-600 mb-6">Registrar Venta</h1>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    {{ form.vendedor|add_class:"w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" }}
+                </div>
+                <div>
+                    {{ form.cliente_rut|add_class:"w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" }}
+                </div>
+                
+                <div id="formsetContainer">
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                    <div class="formsetRow grid gap-4 grid-cols-1 sm:grid-cols-2">
+                        <div class="col-span-1 sm:col-span-2">
+                            <label class="block text-gray-700">Bicicleta:</label>
+                            {{ form.bicicleta|add_class:"w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" }}
+                        </div>
+                        <div class="col-span-1 sm:col-span-2">
+                            <label class="block text-gray-700">Cantidad:</label>
+                            {{ form.cantidad|add_class:"w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600" }}
+                        </div>
+                        <button type="button" class="removeRow">Eliminar</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="addRow">Añadir Bicicleta</button>
+
+                <div class="text-center mt-6">
+                    <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600">Registrar Venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('formsetContainer');
+            const addButton = document.getElementById('addRow');
+            let totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+            
+            addButton.addEventListener('click', function() {
+                let newForm = container.querySelector('.formsetRow:last-child').cloneNode(true);
+                let formRegex = RegExp(`id_${formset.prefix}-\\d+-`, 'g');
+
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `id_${formset.prefix}-${totalForms.value}-`);
+                container.appendChild(newForm);
+                totalForms.value = parseInt(totalForms.value) + 1; // Increment the number of total forms
+                newForm.querySelector('.removeRow').addEventListener('click', function() {
+                    this.parentElement.remove();
+                    totalForms.value = parseInt(totalForms.value) - 1; // Decrement the total forms count
+                });
+            });
+
+            container.addEventListener('click', function(event) {
+                if (event.target.classList.contains('removeRow')) {
+                    event.target.closest('.formsetRow').remove();
+                    totalForms.value = parseInt(totalForms.value) - 1; // Decrement the total forms count
+                }
+            });
+        });
+    </script>
+</body>
+</html>

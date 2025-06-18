@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load formatos %}
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Catálogo de Bicicletas - BIKEHUB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-50">
+    {% include 'clientes/navbar.html' %}
+    
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Catálogo de Bicicletas</h1>
+        
+        <!-- Filtros -->
+        <form method="get" class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Filtros</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Bicicleta</label>
+                    <select name="tipo" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Todos los tipos</option>
+                        {% for tipo_id, tipo_nombre in tipos %}
+                            <option value="{{ tipo_id }}" {% if filtros_actuales.tipo == tipo_id %}selected{% endif %}>
+                                {{ tipo_nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rango de Precio</label>
+                    <select name="precio" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Todos los precios</option>
+                        <option value="0-200000" {% if filtros_actuales.precio == '0-200000' %}selected{% endif %}>$0 - $200.000</option>
+                        <option value="200000-500000" {% if filtros_actuales.precio == '200000-500000' %}selected{% endif %}>$200.000 - $500.000</option>
+                        <option value="500000+" {% if filtros_actuales.precio == '500000+' %}selected{% endif %}>$500.000+</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Marca</label>
+                    <select name="marca" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Todas las marcas</option>
+                        {% for marca in marcas %}
+                            <option value="{{ marca }}" {% if filtros_actuales.marca == marca %}selected{% endif %}>
+                                {{ marca }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ordenar por</label>
+                    <select name="orden" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Relevancia</option>
+                        <option value="precio_asc" {% if filtros_actuales.orden == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+                        <option value="precio_desc" {% if filtros_actuales.orden == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+                        <option value="nombre_asc" {% if filtros_actuales.orden == 'nombre_asc' %}selected{% endif %}>Nombre: A-Z</option>
+                        <option value="nombre_desc" {% if filtros_actuales.orden == 'nombre_desc' %}selected{% endif %}>Nombre: Z-A</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end space-x-4">
+                <a href="{% url 'catalogo_bicicletas' %}" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Limpiar Filtros
+                </a>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                    Aplicar Filtros
+                </button>
+            </div>
+        </form>
+
+        <!-- Grid de Bicicletas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for bicicleta in bicicletas %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
+                <a href="{% url 'detalles_bicicleta' bicicleta.id %}" class="block">
+                    <div class="relative">
+                        <img src="{{ bicicleta.imagen.url }}" 
+                             alt="{{ bicicleta.marca }} {{ bicicleta.modelo }}" 
+                             class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm">
+                            {{ bicicleta.tipo }}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">
+                            {{ bicicleta.marca }} {{ bicicleta.modelo }}
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-2">
+                            {{ bicicleta.descripcion|truncatechars:100 }}
+                        </p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-xl font-bold text-blue-600">
+                                {{ bicicleta.precio_venta|formato_clp }}
+                            </span>
+                            <form action="{% url 'Carro:agregar_a_carrito' bicicleta.id %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200">
+                                    Agregar al Carrito
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full">
+                <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">No se encontraron bicicletas</h3>
+                    <p class="text-gray-600 mb-4">Intenta con otros filtros o revisa nuestro catálogo completo</p>
+                    <a href="{% url 'catalogo_bicicletas' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200">
+                        Ver Todo el Catálogo
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

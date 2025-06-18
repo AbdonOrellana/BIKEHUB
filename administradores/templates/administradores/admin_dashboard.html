@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    {% load admin_formatos %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .content-hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Selecciona todos los elementos con la clase 'toggle'
+            const toggles = document.querySelectorAll('.toggle');
+
+            // Agrega un listener de evento de clic a cada toggle
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    // Esto buscará el siguiente elemento hermano y alternará su visibilidad
+                    const content = this.nextElementSibling;
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                    } else {
+                        content.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="min-h-screen bg-gray-100 p-10">
+        <h1 class="text-4xl font-bold text-center text-gray-700 mb-10">Dashboard Administrativo</h1>
+
+        <div class="grid grid-cols-1 gap-4">
+            <!-- Detalles de Ventas Recientes -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 cursor-pointer toggle">Ventas Recientes</h2>
+                <div class="content-hidden">
+                    {% for venta in ventas_recientes %}
+                    <div class="p-2 border-b border-gray-300">
+                        Venta #{{ venta.numero_venta }} | Cliente: {{ venta.cliente_rut }}<br>
+                        Fecha: {{ venta.fecha|date:"d M Y H:i" }} | Total: {{ venta.total|formato_clp }}<br>
+                        Detalles :
+                        <hr>
+                        <ul>
+                            {% for detalle in venta.detalles.all %}
+                            <li>Modelo: {{ detalle.bicicleta.modelo }} </li>
+                            <li>Cantidad :{{ detalle.cantidad }}</li>
+                            <li>Subtotal: {{ detalle.subtotal|formato_clp }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Detalles de Ventas en WEB Recientes -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 cursor-pointer toggle">Ventas en web</h2>
+                <div class="content-hidden">
+                    {% for orden in compras_recientes %}
+                    <div class="p-2 border-b border-gray-300">
+                        Orden #{{ orden.id }} | Estado: {{ orden.get_estado_display }}<br>
+                        Fecha de creación: {{ orden.fecha_creacion|date:"d M Y H:i" }}<br>
+                        Detalles de la Orden:
+                        <ul>
+                            {% for item in orden.items.all %}
+                            <li>Cantidad: {{ item.cantidad }}</li>
+                            <li>Modelo: {{ item.bicicleta.modelo }} - Precio: {{ item.precio|formato_clp }} c/u</li>
+                            <li>Subtotal: {{ item.subtotal|formato_clp }}</li>
+                            <li>Total: {{ orden.total|formato_clp }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Detalles de Reparaciones Recientes -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 cursor-pointer toggle">Reparaciones</h2>
+                <div class="content-hidden">
+                    {% for reparacion in reparaciones_recientes %}
+                    <div class="p-2 border-b border-gray-300">
+                        Reparación #{{ reparacion.id }}<br>
+                        Cliente: {{ reparacion.cliente.nombre }}<br>
+                        Técnico: {{ reparacion.reserva_tecnico.tecnico.nombre }}<br>
+                        Problema: {{ reparacion.descripcion_problema }}<br>
+                        Fecha: {{ reparacion.fecha_creacion|date:"d M Y" }}<br>
+                        Estado: {{ reparacion.estado_reparacion }}<br>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Detalles de Arriendos Recientes -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 cursor-pointer toggle">Arriendos</h2>
+                <div class="content-hidden">
+                    {% for arriendo in arriendos_recientes %}
+                    <div class="p-2 border-b border-gray-300">
+                        Arriendo #{{ arriendo.id }} | Estado: {{ arriendo.estado }}<br>
+                        Bicicleta: {{ arriendo.bicicleta.modelo }}<br>
+                        Desde: {{ arriendo.fecha_inicio|date:"d M Y" }}<br>
+                        Hasta: {{ arriendo.fecha_fin|date:"d M Y" }}<br>
+                        Forma de Pago: {{ arriendo.forma_pago }}<br>
+                        Costo Total: ${{ arriendo.costo_total|formato_clp }}<br>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

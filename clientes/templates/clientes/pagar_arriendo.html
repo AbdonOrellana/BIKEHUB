@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center mb-0"><i class="fas fa-credit-card mr-2"></i>Pagar Arriendo</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h4 class="mb-3 text-primary"><i class="fas fa-bicycle mr-2"></i>Resumen del Arriendo</h4>
+                        <ul class="list-group">
+                            <li class="list-group-item">Bicicleta: <strong>{{ arriendo.bicicleta }}</strong></li>
+                            <li class="list-group-item">Fecha inicio: <strong>{{ arriendo.fecha_inicio }}</strong></li>
+                            <li class="list-group-item">Fecha fin: <strong>{{ arriendo.fecha_fin }}</strong></li>
+                            <li class="list-group-item">Costo arriendo: <strong>${{ arriendo.costo_arriendo }}</strong></li>
+                            <li class="list-group-item">Depósito garantía: <strong>${{ arriendo.deposito_garantia }}</strong></li>
+                            <li class="list-group-item">Total a pagar: <strong class="text-success">${{ arriendo.costo_total }}</strong></li>
+                        </ul>
+                    </div>
+                    <hr>
+                    <form id="stripe-form">
+                        <div class="mb-3">
+                            <label for="card-element" class="form-label font-weight-bold">
+                                <i class="fas fa-credit-card mr-1 text-primary"></i>Información de la Tarjeta
+                            </label>
+                            <div id="card-element" class="form-control p-3 bg-light border border-primary"></div>
+                            <div id="stripe-error" class="text-danger mt-2 font-weight-bold" role="alert"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 d-flex align-items-center justify-content-center" id="submit-button">
+                            <i class="fas fa-lock mr-2"></i>Pagar ${{ arriendo.costo_total }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const card = elements.create('card', {
+        style: {
+            base: {
+                color: '#212529',
+                fontFamily: 'inherit',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#adb5bd',
+                },
+            },
+            invalid: {
+                color: '#e3342f',
+                iconColor: '#e3342f',
+            },
+        },
+    });
+    card.mount('#card-element');
+
+    const form = document.getElementById('stripe-form');
+    const submitButton = document.getElementById('submit-button');
+
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>Procesando...';
+        try {
+            // Crear el PaymentIntent y obtener el clientSecret
+            const response = await fetch('/pagos/crear_pago_arriendo/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    payment_method_id: null // Se creará después
+                })
+            });
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            // Crear el payment method y confirmar el pago
+            const {paymentMethod, error} = await stripe.createPaymentMethod({
+                type: 'card',
+                card: card,
+            });
+            if (error) {
+                throw new Error(error.message);
+            }
+            const result = await stripe.confirmCardPayment(data.clientSecret, {
+                payment_method: paymentMethod.id
+            });
+            if (result.error) {
+                throw new Error(result.error.message);
+            } else {
+                // Confirmar el pago exitoso en el backend
+                try {
+                    const confirmResponse = await fetch('/pagos/confirmar-pago-exitoso/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            payment_intent_id: result.paymentIntent.id
+                        })
+                    });
+                    if (confirmResponse.ok) {
+                        window.location.href = '/pagos/exito/';
+                    } else {
+                        throw new Error('Error al confirmar el pago');
+                    }
+                } catch (confirmError) {
+                    window.location.href = '/pagos/exito/';
+                }
+            }
+        } catch (error) {
+            const errorElement = document.getElementById('stripe-error');
+            errorElement.textContent = error.message;
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-lock mr-2"></i>Pagar ${{ arriendo.costo_total }}';
+        }
+    });
+</script>
+{% endblock %} 

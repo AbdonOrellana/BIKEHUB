@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    {%load admin_formatos%}
+    <title>Ganancias Semanales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center">
+            <h1 class="text-4xl font-semibold text-gray-800 mb-6">Ganancias Semanales</h1>
+            <div class="inline-block w-full p-6 bg-white rounded-lg shadow-lg">
+                <div id="grafico">{{ grafico|safe }}</div>
+            </div>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <p class="text-xl text-gray-800 font-medium">Ventas</p>
+                    <p class="text-3xl text-green-500 font-semibold">{{ ventas|formato_clp }}</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <p class="text-xl text-gray-800 font-medium">Arriendos</p>
+                    <p class="text-3xl text-blue-500 font-semibold">{{ arriendos|formato_clp }}</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <p class="text-xl text-gray-800 font-medium">Total</p>
+                    <p class="text-3xl text-red-500 font-semibold">{{ total|formato_clp }}</p>
+                </div>
+            </div>
+        </div>
+        <a href="?pdf=true">Descargar PDF</a>
+    </div>
+</body>
+</html>

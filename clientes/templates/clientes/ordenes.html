@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    {% load formatos %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Actividad - BIKEHUB</title>
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+        .accordion-content {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'theme-primary': '#2980B9',
+                        'theme-secondary': '#2471A3',
+                        'theme-accent': '#5DADE2',
+                        'masterbikes-green': '#14A44D',
+                        'masterbikes-orange': '#FF6600',
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.accordion-toggle').forEach(item => {
+                item.addEventListener('click', function() {
+                    let accordionContent = this.nextElementSibling;
+                    let icon = this.querySelector('.toggle-icon');
+                    accordionContent.classList.toggle('hidden');
+                    icon.classList.toggle('fa-chevron-down');
+                    icon.classList.toggle('fa-chevron-up');
+                });
+            });
+        });
+    </script>
+</head>
+<body class="bg-gray-50">
+    {%include 'clientes/navbar.html'%}
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <h1 class="text-4xl font-bold text-center mb-8 text-blue-800">
+            <i class="fas fa-history mr-2"></i>Mi Actividad
+        </h1>
+        
+        <div class="space-y-12">
+            <!-- Sección de Órdenes -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <h2 class="text-2xl font-bold text-center mb-8 text-blue-700">
+                    <i class="fas fa-shopping-cart mr-2"></i>Mis Órdenes
+                </h2>
+                
+                {% if ordenes %}
+                    <div class="space-y-6">
+                        {% for orden in ordenes %}
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 card-hover">
+                                <div class="bg-blue-700 text-white px-6 py-4 rounded-t-lg accordion-toggle cursor-pointer flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-lg font-medium">
+                                            Orden #{{ orden.id }}
+                                        </h3>
+                                        <p class="mt-1 text-sm">
+                                            Estado: <span class="status-badge font-semibold bg-white text-blue-700 px-3 py-1 rounded-full text-xs">{{ orden.get_estado_display }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <span class="text-lg font-bold">{{ orden.total|formato_clp }}</span>
+                                        <i class="fas fa-chevron-down toggle-icon transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="px-6 py-4 hidden accordion-content">
+                                    <h4 class="text-md font-medium mb-4 text-gray-700">Detalles de la orden:</h4>
+                                    <ul class="divide-y divide-gray-200">
+                                        {% for item in orden.items.all %}
+                                            <li class="py-4 flex justify-between items-center hover:bg-gray-50 transition-colors duration-200">
+                                                <div class="flex items-center space-x-4">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-bicycle text-2xl text-blue-500"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-gray-900">
+                                                            {{ item.bicicleta.marca }} {{ item.bicicleta.modelo }}
+                                                        </p>
+                                                        <p class="text-sm text-gray-500">
+                                                            Cantidad: {{ item.cantidad }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <p class="text-sm font-medium text-blue-700">
+                                                        {{ item.precio|formato_clp }}
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-shopping-cart text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 text-lg mb-4">No tienes órdenes en este momento.</p>
+                        <a href="{% url 'tienda' %}" class="inline-block bg-blue-700 text-white px-8 py-3 rounded-lg hover:bg-blue-800 transition-colors duration-300 transform hover:scale-105">
+                            <i class="fas fa-store mr-2"></i>Ir a la tienda
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sección de Reparaciones -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <h2 class="text-2xl font-bold text-center mb-8 text-blue-700">
+                    <i class="fas fa-tools mr-2"></i>Reparaciones
+                </h2>
+                
+                {% if reparaciones %}
+                    <div class="space-y-6">
+                        {% for reparacion in reparaciones %}
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 card-hover">
+                                <div class="bg-blue-700 text-white px-6 py-4 rounded-t-lg accordion-toggle cursor-pointer flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-lg font-medium">
+                                            Reparación #{{ reparacion.id }}
+                                        </h3>
+                                        <p class="mt-1 text-sm">
+                                            Estado: <span class="status-badge font-semibold bg-white text-blue-700 px-3 py-1 rounded-full text-xs">{{ reparacion.estado_reparacion }}</span>
+                                        </p>
+                                    </div>
+                                    <i class="fas fa-chevron-down toggle-icon transition-transform duration-300"></i>
+                                </div>
+                                <div class="px-6 py-4 hidden accordion-content">
+                                    <h4 class="text-md font-medium mb-4 text-gray-700">Detalles de la reparación:</h4>
+                                    <div class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                        <p class="text-sm text-gray-700">
+                                            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                            {{ reparacion.descripcion_problema }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-tools text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 text-lg mb-4">No tienes reparaciones pendientes.</p>
+                        <a href="{% url 'reparacion' %}" class="inline-block bg-blue-700 text-white px-8 py-3 rounded-lg hover:bg-blue-800 transition-colors duration-300 transform hover:scale-105">
+                            <i class="fas fa-wrench mr-2"></i>Solicitar reparación
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sección de Arriendos -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <h2 class="text-2xl font-bold text-center mb-8 text-sky-600">
+                    <i class="fas fa-bicycle mr-2"></i>Arriendos
+                </h2>
+                
+                {% if arriendos %}
+                    <div class="space-y-6">
+                        {% for arriendo in arriendos %}
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 card-hover">
+                                <div class="bg-sky-600 text-white px-6 py-4 rounded-t-lg accordion-toggle cursor-pointer flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-lg font-medium">
+                                            Arriendo #{{ arriendo.id }}
+                                        </h3>
+                                        <p class="mt-1 text-sm">
+                                            <i class="fas fa-bicycle mr-2"></i>
+                                            {{ arriendo.bicicleta.modelo }}
+                                        </p>
+                                    </div>
+                                    <i class="fas fa-chevron-down toggle-icon transition-transform duration-300"></i>
+                                </div>
+                                <div class="px-6 py-4 hidden accordion-content">
+                                    <h4 class="text-md font-medium mb-4 text-gray-700">Detalles del arriendo:</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                            <p class="text-sm text-gray-700">
+                                                <i class="far fa-calendar-alt mr-2 text-sky-500"></i>
+                                                Desde: <span class="font-semibold">{{ arriendo.fecha_inicio|date:"d M Y" }}</span>
+                                            </p>
+                                            <p class="text-sm text-gray-700 mt-2">
+                                                <i class="far fa-calendar-check mr-2 text-sky-500"></i>
+                                                Hasta: <span class="font-semibold">{{ arriendo.fecha_fin|date:"d M Y" }}</span>
+                                            </p>
+                                        </div>
+                                        <div class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                            <p class="text-sm text-gray-700">
+                                                <i class="fas fa-dollar-sign mr-2 text-sky-500"></i>
+                                                Costo total: <span class="font-semibold">{{arriendo.costo_total|formato_clp}}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-bicycle text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 text-lg mb-4">No tienes arriendos activos.</p>
+                        <a href="{% url 'arriendo' %}" class="inline-block bg-sky-600 text-white px-8 py-3 rounded-lg hover:bg-sky-700 transition-colors duration-300 transform hover:scale-105">
+                            <i class="fas fa-calendar-plus mr-2"></i>Arrendar bicicleta
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>
